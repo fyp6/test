@@ -1,0 +1,66 @@
+<%@ page import="com.mycompany.project.model.UserBean" %>
+<%@ taglib prefix="cchc" uri="http://cchc/tags" %>
+<%
+    UserBean currentUser = (UserBean) session.getAttribute("currentUser");
+    String flash = (String) session.getAttribute("flash");
+    String flashError = (String) session.getAttribute("flashError");
+    if (flash != null) {
+        session.removeAttribute("flash");
+    }
+    if (flashError != null) {
+        session.removeAttribute("flashError");
+    }
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCHC Clinic System</title>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/app.css">
+</head>
+<body>
+<header class="topbar">
+    <div class="container">
+        <div class="brand">CCHC Appointment and Queue System</div>
+        <nav class="nav">
+            <% if (currentUser == null) { %>
+                <a href="<%= request.getContextPath() %>/login">Login</a>
+                <a href="<%= request.getContextPath() %>/register">Register</a>
+            <% } else { %>
+                <a href="<%= request.getContextPath() %>/dashboard">Dashboard</a>
+                <a href="<%= request.getContextPath() %>/appointments">Appointments</a>
+                <a href="<%= request.getContextPath() %>/queue">Queue</a>
+                <% if ("STAFF".equals(currentUser.getRole()) || "ADMIN".equals(currentUser.getRole())) { %>
+                    <a href="<%= request.getContextPath() %>/issues">Operational Issues</a>
+                <% } %>
+                <% if ("ADMIN".equals(currentUser.getRole())) { %>
+                    <a href="<%= request.getContextPath() %>/admin/users">Admin Users</a>
+                    <a href="<%= request.getContextPath() %>/admin/catalog">Catalog</a>
+                    <a href="<%= request.getContextPath() %>/admin/reports">Reports</a>
+                    <a href="<%= request.getContextPath() %>/admin/audit">Incident Logs</a>
+                    <a href="<%= request.getContextPath() %>/admin/policy">Policy</a>
+                <% } %>
+                <a href="<%= request.getContextPath() %>/profile">Profile</a>
+                <a href="<%= request.getContextPath() %>/logout">Logout</a>
+            <% } %>
+        </nav>
+    </div>
+</header>
+<main class="main">
+    <div class="container">
+        <% if (currentUser != null) { %>
+            <div class="card page-banner">
+                <div class="page-banner__copy">
+                    <span class="muted">Signed in as</span>
+                    <strong><%= currentUser.getFullName() %></strong>
+                </div>
+                <cchc:roleBadge role="<%= currentUser.getRole() %>" />
+            </div>
+        <% } %>
+        <% if (flash != null) { %>
+            <div class="flash flash-ok"><%= flash %></div>
+        <% } %>
+        <% if (flashError != null) { %>
+            <div class="flash flash-error"><%= flashError %></div>
+        <% } %>
